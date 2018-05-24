@@ -23,6 +23,37 @@ products = [
     {"id":20, "name": "Pomegranate Cranberry & Aloe Vera Enrich Drink", "department": "beverages", "aisle": "juice nectars", "price": 4.25}
 ] # based on data from Instacart: https://www.instacart.com/datasets/grocery-shopping-2017
 
-print(products)
+# print(products)
 
-# TODO: write some Python code here to produce the desired functionality
+id_inputs = []
+cart_list = []
+
+def product_by_id(product_id):
+    return [product for product in products if str(product["id"]) == product_id][0]
+
+def sum_cart_subtotal(cart_id_list):
+    total = 0
+    for item_id in cart_id_list:
+        product = product_by_id(item_id)
+        cart_list.append(product)
+        total = total + product["price"]
+    return round(total, 2)
+
+def calc_sales_tax(cost):
+    return round(cost * .08875, 2)
+
+def sum_cart_total(subtotal, sales_tax):
+    return subtotal + sales_tax
+
+while True:
+    product_id = input("Please input a product identifier, or 'DONE' if there are no more items: ")
+    if product_id == 'DONE':
+        break;
+    id_inputs.append(product_id)
+
+subtotal = sum_cart_subtotal(id_inputs)
+sales_tax = calc_sales_tax(subtotal)
+total = sum_cart_total(subtotal, sales_tax)
+print("Subtotal: " + str(subtotal))
+print("Plus NYC Sales Tax (8.875%): " + str(sales_tax))
+print("Total: " + str(total))
