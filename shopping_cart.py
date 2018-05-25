@@ -25,35 +25,60 @@ products = [
 
 # print(products)
 
+import datetime
+
 id_inputs = []
 cart_list = []
 
 def product_by_id(product_id):
     return [product for product in products if str(product["id"]) == product_id][0]
 
-def sum_cart_subtotal(cart_id_list):
+def sum_cart_subtotal(cart):
     total = 0
-    for item_id in cart_id_list:
-        product = product_by_id(item_id)
-        cart_list.append(product)
-        total = total + product["price"]
+    for item in cart:
+        total = total + item["price"]
     return round(total, 2)
 
 def calc_sales_tax(cost):
     return round(cost * .08875, 2)
 
 def sum_cart_total(subtotal, sales_tax):
-    return subtotal + sales_tax
+    return round(subtotal + sales_tax, 2)
+
+def print_top_header():
+    datetimeobject = datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S')
+    print("--------------------------------")
+    print("My Grocery Store")
+    print("--------------------------------")
+    print("Web: www.mystore.com")
+    print("Phone: 1.123.456.7890")
+    print("Checkout Time: " + str(datetimeobject))
+    print("--------------------------------")
+
+def print_cart_items(cart):
+    print("Shopping Cart Items:")
+    for item in cart:
+        print(" + " + item["name"] + " (${0:.2f})".format(item["price"]))
+    print("--------------------------------")
+
+def print_sale_price_details(subtotal, sales_tax, total):
+    print("Subtotal: $" + str(subtotal))
+    print("Plus NYC Sales Tax (8.875%): $" + str(sales_tax))
+    print("Total: $" + str(total))
+    print("--------------------------------")
+    print("Thanks for your business! Please come again.")
 
 while True:
     product_id = input("Please input a product identifier, or 'DONE' if there are no more items: ")
     if product_id == 'DONE':
         break;
-    id_inputs.append(product_id)
+    product = product_by_id(product_id)
+    cart_list.append(product)
 
-subtotal = sum_cart_subtotal(id_inputs)
+
+print_top_header()
+print_cart_items(cart_list)
+subtotal = sum_cart_subtotal(cart_list)
 sales_tax = calc_sales_tax(subtotal)
 total = sum_cart_total(subtotal, sales_tax)
-print("Subtotal: " + str(subtotal))
-print("Plus NYC Sales Tax (8.875%): " + str(sales_tax))
-print("Total: " + str(total))
+print_sale_price_details(subtotal, sales_tax, total)
