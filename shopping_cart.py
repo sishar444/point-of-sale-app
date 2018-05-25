@@ -26,12 +26,13 @@ products = [
 # print(products)
 
 import datetime
+import os.path
 
 id_inputs = []
 cart_list = []
 
 def product_by_id(product_id):
-    return [product for product in products if str(product["id"]) == product_id][0]
+    return [product for product in products if str(product["id"]) == product_id]
 
 def sum_cart_subtotal(cart):
     total = 0
@@ -47,38 +48,52 @@ def sum_cart_total(subtotal, sales_tax):
 
 def print_top_header():
     datetimeobject = datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S')
-    print("--------------------------------")
-    print("My Grocery Store")
-    print("--------------------------------")
-    print("Web: www.mystore.com")
-    print("Phone: 1.123.456.7890")
-    print("Checkout Time: " + str(datetimeobject))
-    print("--------------------------------")
+    header_string = "--------------------------------\nMy Grocery Store\n--------------------------------\n"
+    header_string = header_string + "Web: www.mystore.com\nPhone: 1.123.456.7890\nCheckout Time: " + str(datetimeobject) + "\n--------------------------------"
+    return header_string
 
 def print_cart_items(cart):
-    print("Shopping Cart Items:")
+    shopping_cart_string = "Shopping Cart Items:\n"
     for item in cart:
-        print(" + " + item["name"] + " (${0:.2f})".format(item["price"]))
-    print("--------------------------------")
+        shopping_cart_string = shopping_cart_string + " + " + item["name"] + " (${0:.2f})\n".format(item["price"])
+    shopping_cart_string = shopping_cart_string + "--------------------------------"
+    return shopping_cart_string
 
 def print_sale_price_details(subtotal, sales_tax, total):
-    print("Subtotal: $" + str(subtotal))
-    print("Plus NYC Sales Tax (8.875%): $" + str(sales_tax))
-    print("Total: $" + str(total))
-    print("--------------------------------")
-    print("Thanks for your business! Please come again.")
+    sale_price_details_string = "Subtotal: $" + str(subtotal) + "\nPlus NYC Sales Tax (8.875%): $" + str(sales_tax) + "\nTotal: $" + str(total)
+    sale_price_details_string = sale_price_details_string + "\n--------------------------------\nThanks for your business! Please come again."
+    return sale_price_details_string
+
+def print_receipt():
+    print(print_top_header())
+    print(print_cart_items(cart_list))
+    subtotal = sum_cart_subtotal(cart_list)
+    sales_tax = calc_sales_tax(subtotal)
+    total = sum_cart_total(subtotal, sales_tax)
+    print(print_sale_price_details(subtotal, sales_tax, total))
+
+def write_reciept_to_file():
+    datetimeobject = datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d-%H-%M-%S')
+    filename = str(datetimeobject) + ".txt"
+    filepath = "Desktop/PythonClass/point-of-sale-app/receipts/"
+    with open(os.path.join(os.path.expanduser('~'), filepath, filename), "w") as file:
+        file.write(print_top_header())
+        file.write("\n" + print_cart_items(cart_list))
+        subtotal = sum_cart_subtotal(cart_list)
+        sales_tax = calc_sales_tax(subtotal)
+        total = sum_cart_total(subtotal, sales_tax)
+        file.write("\n" + print_sale_price_details(subtotal, sales_tax, total))
+
 
 while True:
     product_id = input("Please input a product identifier, or 'DONE' if there are no more items: ")
-    if product_id == 'DONE':
+    if product_id.lower() == 'done':
         break;
-    product = product_by_id(product_id)
-    cart_list.append(product)
+    if product_by_id(product_id):
+        product = product_by_id(product_id)[0]
+        cart_list.append(product)
+    else:
+        print("Hey, are you sure that product identifier is correct? Please try again!")
 
-
-print_top_header()
-print_cart_items(cart_list)
-subtotal = sum_cart_subtotal(cart_list)
-sales_tax = calc_sales_tax(subtotal)
-total = sum_cart_total(subtotal, sales_tax)
-print_sale_price_details(subtotal, sales_tax, total)
+print_receipt()
+write_reciept_to_file()
